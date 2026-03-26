@@ -1,6 +1,8 @@
-examples/
-lib/
-src/
+.claude/
+.cursor/
+./examples/
+/lib/
+/src/
 CLAUDE.md
 index.ts
 generate.ts
