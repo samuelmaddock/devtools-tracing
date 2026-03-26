@@ -1,0 +1,6 @@
+node_modules/
+.cursor/
+.claude/
+lib/
+dist/
+.DS_Store
