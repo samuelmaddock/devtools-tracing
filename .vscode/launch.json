@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug sourcemap example",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "args": ["examples/sourcemap.ts", "${input:traceFile}"],
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "traceFile",
+      "type": "promptString",
+      "description": "Path to trace file (.json or .json.gz)"
+    }
+  ]
+}

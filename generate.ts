@@ -42,7 +42,7 @@ const COMMON_EXCLUSION_CATEGORIES = [
   'panels/(?!timeline)', // All panels except timeline
 
   // Include only third_party which are required
-  'third_party/(?!i18n|intl-messageformat|legacy-javascript|source-map-scopes-codec|third-party-web)',
+  'third_party/(?!codemirror.next|i18n|intl-messageformat|legacy-javascript|source-map-scopes-codec|third-party-web)',
   
   // Note: This is more aggressive - excluding all UI components
   // May need to add back specific UI components if errors occur
@@ -700,10 +700,12 @@ function stubDomFunctionsInFile(filePath: string): number {
     // Apply replacements from end to start so offsets remain valid
     outermost.reverse();
     let result = content;
+    const isTs = filePath.endsWith('.ts');
+    const asAny = isTs ? ' as any' : '';
     for (const r of outermost) {
       const stub = r.isExpression
-        ? 'undefined as any /* DOM API stubbed */'
-        : '{\n    // DOM API stubbed\n    return undefined as any;\n  }';
+        ? `undefined${asAny} /* DOM API stubbed */`
+        : `{\n    // DOM API stubbed\n    return undefined${asAny};\n  }`;
       result = result.substring(0, r.start) + stub + result.substring(r.end);
       stubCount++;
     }

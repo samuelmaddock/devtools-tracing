@@ -8,6 +8,7 @@
     "build": "tsc --emitDeclarationOnly || true; esbuild index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs",
     "generate": "tsx generate.ts",
     "example:inp": "tsx examples/inp.ts",
+    "example:sourcemap": "tsx examples/sourcemap.ts",
     "example:stats": "tsx examples/stats.ts",
     "size": "du -sh dist/",
     "prepublishOnly": "npm run generate && npm run build"
