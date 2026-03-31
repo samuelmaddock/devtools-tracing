@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as zlib from 'node:zlib';
 
-import { initDevToolsTracing, Trace } from '../';
+import { initDevToolsTracing, Trace, generateInvalidationsList } from '../';
 
 const SelectorTimingsKey = Trace.Types.Events.SelectorTimingsKey;
 
@@ -63,6 +63,9 @@ export async function run(tracePath: string) {
   const allTimings = [...selectorMap.values()];
   const TOP_N = 15;
 
+  const truncateSelector = (s: string) =>
+    s.length > 80 ? `${s.slice(0, 77)}...` : s;
+
   // Top selectors by elapsed time
   const byElapsed = allTimings
     .sort(
@@ -71,13 +74,23 @@ export async function run(tracePath: string) {
     )
     .slice(0, TOP_N);
 
+  // eslint-disable-next-line no-console
   console.log(`\n=== Top ${TOP_N} CSS Selectors by Elapsed Time ===\n`);
-  for (const t of byElapsed) {
-    const elapsedMs = (t[SelectorTimingsKey.Elapsed] / 1000).toFixed(2);
-    console.log(
-      `  ${elapsedMs}ms | attempts: ${t[SelectorTimingsKey.MatchAttempts]} | matches: ${t[SelectorTimingsKey.MatchCount]} | ${t[SelectorTimingsKey.Selector]}`,
-    );
-  }
+  // eslint-disable-next-line no-console
+  console.table(
+    Object.fromEntries(
+      byElapsed.map((t, i) => [
+        i + 1,
+        {
+          selector: truncateSelector(t[SelectorTimingsKey.Selector]),
+          'elapsed (μs)': t[SelectorTimingsKey.Elapsed],
+          match_attempts: t[SelectorTimingsKey.MatchAttempts],
+          match_count: t[SelectorTimingsKey.MatchCount],
+          fast_reject_count: t[SelectorTimingsKey.FastRejectCount],
+        },
+      ]),
+    ),
+  );
 
   // Top selectors by match attempts
   const byAttempts = [...selectorMap.values()]
@@ -88,44 +101,49 @@ export async function run(tracePath: string) {
     )
     .slice(0, TOP_N);
 
+  // eslint-disable-next-line no-console
   console.log(`\n=== Top ${TOP_N} CSS Selectors by Match Attempts ===\n`);
-  for (const t of byAttempts) {
-    const elapsedMs = (t[SelectorTimingsKey.Elapsed] / 1000).toFixed(2);
-    console.log(
-      `  ${t[SelectorTimingsKey.MatchAttempts]} attempts | ${elapsedMs}ms | matches: ${t[SelectorTimingsKey.MatchCount]} | ${t[SelectorTimingsKey.Selector]}`,
-    );
-  }
+  // eslint-disable-next-line no-console
+  console.table(
+    Object.fromEntries(
+      byAttempts.map((t, i) => [
+        i + 1,
+        {
+          selector: truncateSelector(t[SelectorTimingsKey.Selector]),
+          match_attempts: t[SelectorTimingsKey.MatchAttempts],
+          'elapsed (μs)': t[SelectorTimingsKey.Elapsed],
+          match_count: t[SelectorTimingsKey.MatchCount],
+          fast_reject_count: t[SelectorTimingsKey.FastRejectCount],
+        },
+      ]),
+    ),
+  );
 
   // --- Invalidation Tracking ---
-  const invalidatedNodes = selectorStatsData.invalidatedNodeList;
-  console.log(
-    `\n=== Invalidation Tracking (${invalidatedNodes.length} invalidated nodes) ===\n`,
-  );
-
-  // Aggregate selectors that caused invalidations
-  const invalidationSelectorCounts = new Map<string, number>();
-  for (const node of invalidatedNodes) {
-    for (const sel of node.selectorList) {
-      const count = invalidationSelectorCounts.get(sel.selector) ?? 0;
-      invalidationSelectorCounts.set(sel.selector, count + 1);
-    }
+  const invalidationsData = parsedTraceData.Invalidations;
+  const allInvalidations: Trace.Types.Events.InvalidationTrackingEvent[] = [];
+  for (const [, invalidations] of invalidationsData.invalidationsForEvent) {
+    allInvalidations.push(...invalidations);
   }
 
-  const topInvalidationSelectors = [...invalidationSelectorCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, TOP_N);
+  const { groupedByReason, backendNodeIds } = generateInvalidationsList(allInvalidations);
+  const reasons = Object.entries(groupedByReason).sort((a, b) => b[1].length - a[1].length);
 
+  // eslint-disable-next-line no-console
   console.log(
-    `  Top ${TOP_N} selectors causing invalidations:\n`,
+    `\n=== Invalidation Tracking (${allInvalidations.length} invalidations, ${backendNodeIds.size} unique nodes) ===\n`,
   );
-  for (const [selector, count] of topInvalidationSelectors) {
-    console.log(`  ${count}x | ${selector}`);
-  }
-
-  // Subtree vs single-node invalidations
-  const subtreeCount = invalidatedNodes.filter((n) => n.subtree).length;
-  console.log(
-    `\n  Subtree invalidations: ${subtreeCount} / ${invalidatedNodes.length} total`,
+  // eslint-disable-next-line no-console
+  console.table(
+    Object.fromEntries(
+      reasons.map(([reason, invalidations], i) => [
+        i + 1,
+        {
+          reason,
+          count: invalidations.length,
+        },
+      ]),
+    ),
   );
 
   // --- Totals ---
@@ -137,9 +155,13 @@ export async function run(tracePath: string) {
     totalMatchAttempts += t[SelectorTimingsKey.MatchAttempts];
     totalMatchCount += t[SelectorTimingsKey.MatchCount];
   }
+  // eslint-disable-next-line no-console
   console.log(`\n=== Totals ===\n`);
-  console.log(`  Unique selectors: ${allTimings.length}`);
-  console.log(`  Total elapsed: ${(totalElapsedUs / 1000).toFixed(2)}ms`);
-  console.log(`  Total match attempts: ${totalMatchAttempts}`);
-  console.log(`  Total match count: ${totalMatchCount}`);
+  // eslint-disable-next-line no-console
+  console.table({
+    'Unique selectors': allTimings.length,
+    'Total elapsed (μs)': totalElapsedUs,
+    'Total match attempts': totalMatchAttempts,
+    'Total match count': totalMatchCount,
+  });
 }
