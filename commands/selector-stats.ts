@@ -4,6 +4,8 @@ import * as zlib from 'node:zlib';
 import { initDevToolsTracing, Trace, generateInvalidationsList } from '../';
 
 const SelectorTimingsKey = Trace.Types.Events.SelectorTimingsKey;
+const microToMilli = (us: number) =>
+  Trace.Helpers.Timing.microToMilli(Trace.Types.Timing.Micro(us));
 
 export async function run(tracePath: string) {
   initDevToolsTracing();
@@ -83,7 +85,7 @@ export async function run(tracePath: string) {
         i + 1,
         {
           selector: truncateSelector(t[SelectorTimingsKey.Selector]),
-          'elapsed (μs)': t[SelectorTimingsKey.Elapsed],
+          'elapsed (ms)': microToMilli(t[SelectorTimingsKey.Elapsed]),
           match_attempts: t[SelectorTimingsKey.MatchAttempts],
           match_count: t[SelectorTimingsKey.MatchCount],
           fast_reject_count: t[SelectorTimingsKey.FastRejectCount],
@@ -111,7 +113,7 @@ export async function run(tracePath: string) {
         {
           selector: truncateSelector(t[SelectorTimingsKey.Selector]),
           match_attempts: t[SelectorTimingsKey.MatchAttempts],
-          'elapsed (μs)': t[SelectorTimingsKey.Elapsed],
+          'elapsed (ms)': microToMilli(t[SelectorTimingsKey.Elapsed]),
           match_count: t[SelectorTimingsKey.MatchCount],
           fast_reject_count: t[SelectorTimingsKey.FastRejectCount],
         },
@@ -160,7 +162,7 @@ export async function run(tracePath: string) {
   // eslint-disable-next-line no-console
   console.table({
     'Unique selectors': allTimings.length,
-    'Total elapsed (μs)': totalElapsedUs,
+    'Total elapsed (ms)': microToMilli(totalElapsedUs),
     'Total match attempts': totalMatchAttempts,
     'Total match count': totalMatchCount,
   });
