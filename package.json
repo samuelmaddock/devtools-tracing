@@ -4,13 +4,12 @@
   "description": "Utilities for working with trace files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "devtools-tracing": "dist/cli.js"
+  },
   "scripts": {
-    "build": "tsc --emitDeclarationOnly || true; esbuild index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs",
+    "build": "tsc --emitDeclarationOnly || true; esbuild index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs && esbuild cli.ts --bundle --platform=node --outfile=dist/cli.js --format=cjs --banner:js='#!/usr/bin/env node' --external:../",
     "generate": "tsx generate.ts",
-    "example:inp": "tsx examples/inp.ts",
-    "example:sourcemap": "tsx examples/sourcemap.ts",
-    "example:stats": "tsx examples/stats.ts",
-    "example:css-selectors": "tsx examples/css-selectors.ts",
     "size": "du -sh dist/",
     "prepublishOnly": "npm run generate && npm run build"
   },

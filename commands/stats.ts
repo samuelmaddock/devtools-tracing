@@ -8,12 +8,7 @@ import {
   Trace,
 } from '../';
 
-async function main() {
-  const tracePath = process.argv[2];
-  if (!tracePath) {
-    console.error('Usage: npm run examples:stats <path-to-trace-file>');
-    process.exit(1);
-  }
+export async function run(tracePath: string) {
   initDevToolsTracing();
 
   const fileData = fs.readFileSync(tracePath);
@@ -27,7 +22,6 @@ async function main() {
   const traceModel = Trace.TraceModel.Model.createWithAllHandlers({
     debugMode: true,
     enableAnimationsFrameHandler: false,
-    // includeRuntimeCallStats: false,
     maxInvalidationEventsPerEvent: 20,
     showAllEvents: false,
   });
@@ -62,5 +56,3 @@ async function main() {
 
   console.log(stats);
 }
-
-main();

@@ -4,9 +4,33 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug sourcemap example",
+      "name": "Debug selector-stats",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
-      "args": ["examples/sourcemap.ts", "${input:traceFile}"],
+      "args": ["cli.ts", "selector-stats", "${input:traceFile}"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug inp",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "args": ["cli.ts", "inp", "${input:traceFile}"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug sourcemap",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "args": ["cli.ts", "sourcemap", "${input:traceFile}"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug stats",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/tsx",
+      "args": ["cli.ts", "stats", "${input:traceFile}"],
       "console": "integratedTerminal"
     }
   ],

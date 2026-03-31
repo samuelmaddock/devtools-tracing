@@ -8,12 +8,7 @@ import {
   Trace,
 } from '../';
 
-async function main() {
-  const tracePath = process.argv[2];
-  if (!tracePath) {
-    console.error('Usage: npm run example:sourcemap <path-to-trace-file>');
-    process.exit(1);
-  }
+export async function run(tracePath: string) {
   initDevToolsTracing();
 
   const fileData = fs.readFileSync(tracePath);
@@ -117,5 +112,3 @@ async function verboseFetch(url: string): Promise<Response> {
   }
   return response;
 }
-
-main();

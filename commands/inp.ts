@@ -3,12 +3,7 @@ import * as zlib from 'node:zlib';
 
 import { initDevToolsTracing, Trace } from '../';
 
-async function main() {
-  const tracePath = process.argv[2];
-  if (!tracePath) {
-    console.error('Usage: npm run examples:inp <path-to-trace-file>');
-    process.exit(1);
-  }
+export async function run(tracePath: string) {
   initDevToolsTracing();
 
   const fileData = fs.readFileSync(tracePath);
@@ -30,5 +25,3 @@ async function main() {
     inp,
   });
 }
-
-main();

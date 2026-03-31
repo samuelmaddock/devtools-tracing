@@ -5,12 +5,7 @@ import { initDevToolsTracing, Trace } from '../';
 
 const SelectorTimingsKey = Trace.Types.Events.SelectorTimingsKey;
 
-async function main() {
-  const tracePath = process.argv[2];
-  if (!tracePath) {
-    console.error('Usage: npm run example:css-selectors <path-to-trace-file>');
-    process.exit(1);
-  }
+export async function run(tracePath: string) {
   initDevToolsTracing();
 
   const fileData = fs.readFileSync(tracePath);
@@ -148,5 +143,3 @@ async function main() {
   console.log(`  Total match attempts: ${totalMatchAttempts}`);
   console.log(`  Total match count: ${totalMatchCount}`);
 }
-
-main();

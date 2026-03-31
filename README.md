@@ -8,7 +8,35 @@ Node.js library for programmatic analysis of Chrome DevTools performance traces.
 npm install devtools-tracing
 ```
 
-## Quick start
+## CLI
+
+Analyze traces directly from the command line:
+
+```sh
+npx devtools-tracing <command> <trace-file>
+```
+
+Supports both `.json` and `.json.gz` trace files.
+
+### Commands
+
+```sh
+# Top CSS selectors by elapsed time and match attempts, plus invalidation tracking
+npx devtools-tracing selector-stats trace.json.gz
+
+# INP (Interaction to Next Paint) breakdown
+npx devtools-tracing inp trace.json.gz
+
+# Timeline category statistics
+npx devtools-tracing stats trace.json.gz
+
+# Source map symbolication (writes a .symbolicated.json.gz alongside the input)
+npx devtools-tracing sourcemap trace.json.gz
+```
+
+See the [`commands/`](./commands) directory for full source.
+
+## Library usage
 
 ```ts
 import * as fs from 'node:fs';
@@ -32,23 +60,6 @@ await model.parse(traceData.traceEvents, {
 
 const parsedTrace = model.parsedTrace(0);
 ```
-
-## Examples
-
-Run with a trace file (`.json` or `.json.gz`):
-
-```sh
-# INP breakdown
-npm run example:inp -- trace.json.gz
-
-# Timeline category stats
-npm run example:stats -- trace.json.gz
-
-# Source map symbolication
-npm run example:sourcemap -- trace.json.gz
-```
-
-See the [`examples/`](./examples) directory for full source.
 
 ## How it works
 
