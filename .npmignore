@@ -1,6 +1,6 @@
 .claude/
 .cursor/
-./examples/
+/commands/
 /lib/
 /src/
 CLAUDE.md
