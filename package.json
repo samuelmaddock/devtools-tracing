@@ -10,6 +10,7 @@
     "example:inp": "tsx examples/inp.ts",
     "example:sourcemap": "tsx examples/sourcemap.ts",
     "example:stats": "tsx examples/stats.ts",
+    "example:css-selectors": "tsx examples/css-selectors.ts",
     "size": "du -sh dist/",
     "prepublishOnly": "npm run generate && npm run build"
   },
