@@ -8,8 +8,14 @@ import {
   Trace,
 } from '../';
 
-export async function run(tracePath: string) {
+export interface SourcemapOptions {
+  headers?: Record<string, string>;
+}
+
+export async function run(tracePath: string, options?: SourcemapOptions) {
   initDevToolsTracing();
+
+  const extraHeaders = options?.headers;
 
   const fileData = fs.readFileSync(tracePath);
   const decompressedData = tracePath.endsWith('.gz')
@@ -21,7 +27,7 @@ export async function run(tracePath: string) {
 
   const traceModel = Trace.TraceModel.Model.createWithAllHandlers();
   const resolveSourceMap = createSourceMapResolver({
-    fetch: verboseFetch,
+    fetch: (url: string) => verboseFetch(url, extraHeaders),
   });
 
   await traceModel.parse(traceData.traceEvents, {
@@ -100,9 +106,9 @@ export async function run(tracePath: string) {
   console.log(`Wrote symbolicated trace to ${outPath}`);
 }
 
-async function verboseFetch(url: string): Promise<Response> {
+async function verboseFetch(url: string, headers?: Record<string, string>): Promise<Response> {
   console.log(`[sourcemap] fetching ${url}`);
-  const response = await fetch(url);
+  const response = await fetch(url, headers ? { headers } : undefined);
   if (!response.ok) {
     console.warn(
       `[sourcemap] ${url} -> ${response.status} ${response.statusText}`,

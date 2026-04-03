@@ -31,7 +31,7 @@ npx devtools-tracing inp trace.json.gz
 npx devtools-tracing stats trace.json.gz
 
 # Source map symbolication (writes a .symbolicated.json.gz alongside the input)
-npx devtools-tracing sourcemap trace.json.gz
+npx devtools-tracing sourcemap trace.json.gz -H "Cookie: $cookie" -H "User-Agent: $ua"
 ```
 
 See the [`commands/`](./commands) directory for full source.
