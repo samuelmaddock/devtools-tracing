@@ -1,6 +1,7 @@
 export { initDevToolsTracing } from './src/init.js';
 
 export { statsForTimeRange, entryIsVisibleInTimeline } from './src/timeline.js';
+export type { EventCategorizeFunction } from './src/timeline.js';
 export { generateInvalidationsList } from './src/invalidations.js';
 export { createSourceMapResolver, symbolicateTrace } from './src/sourcemap.js';
 export type { SymbolicateOptions, SymbolicateResult } from './src/sourcemap.js';

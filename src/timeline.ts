@@ -3,11 +3,27 @@ import * as Trace from '../lib/front_end/models/trace/trace.js';
 
 type TimeRangeCategoryStats = Record<string, number>;
 
+export type EventCategorizeFunction = (event: Trace.Types.Events.Event) => string;
+
+function defaultCategorizeEvent(event: Trace.Types.Events.Event): string {
+  const category =
+    Trace.Styles.getEventStyle(event.name as Trace.Types.Events.Name)?.category
+      .name || Trace.Styles.getCategoryStyles().other.name;
+  return category;
+}
+
 const categoryBreakdownCacheSymbol = Symbol('categoryBreakdownCache');
 
+/**
+ * Generate categorized stats for events within the given time range.
+ *
+ * Original implementation from TimelineRangeSummaryView.
+ * https://source.chromium.org/chromium/chromium/src/+/main:third_party/devtools-frontend/src/front_end/panels/timeline/components/TimelineRangeSummaryView.ts;l=105;drc=b5804c61986a92fc88553f12f274b27879c63a9b
+ */
 export function statsForTimeRange(
     events: Trace.Types.Events.Event[], startTime: Trace.Types.Timing.Milli,
-    endTime: Trace.Types.Timing.Milli): TimeRangeCategoryStats {
+    endTime: Trace.Types.Timing.Milli,
+    categorizeEvent: EventCategorizeFunction = defaultCategorizeEvent): TimeRangeCategoryStats {
   if (!events.length) {
     return {idle: endTime - startTime};
   }
@@ -97,8 +113,7 @@ export function statsForTimeRange(
 
     function onStartEvent(e: Trace.Types.Events.Event): void {
       const {startTime} = Trace.Helpers.Timing.eventTimingsMilliSeconds(e);
-      const category = Trace.Styles.getEventStyle(e.name as Trace.Types.Events.Name)?.category.name ||
-          Trace.Styles.getCategoryStyles().other.name;
+      const category = categorizeEvent(e);
       const parentCategory = categoryStack.length ? categoryStack[categoryStack.length - 1] : null;
       if (category !== parentCategory) {
         categoryChange(parentCategory || null, category, startTime);
