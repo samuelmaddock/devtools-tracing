@@ -828,6 +828,31 @@ function findTopLevelAwaits(
 }
 
 /**
+ * Replaces the stubbed HOST_RUNTIME with a synchronous Node.js implementation.
+ */
+function fixHostRuntime(): void {
+  const hostRuntimePath = path.join(TARGET_BASE, 'front_end/core/platform/HostRuntime.ts');
+  if (!fs.existsSync(hostRuntimePath)) {
+    return;
+  }
+  let content = fs.readFileSync(hostRuntimePath, 'utf-8');
+  const stub = 'undefined as any /* top-level await stubbed */';
+  if (!content.includes(stub)) {
+    return;
+  }
+  const nodeRuntime = `{
+  createWorker(_url: string): Api.HostRuntime.Worker { throw new Error('Workers not supported in Node.js tracing context'); },
+  workerScope: { postMessage() {}, set onmessage(_: any) {} },
+  getOnLine() { return true; },
+  getUserAgent() { return 'Node.js'; },
+  getLocalStorage() { return undefined; },
+} satisfies Api.HostRuntime.HostRuntime`;
+  content = content.replace(stub, nodeRuntime);
+  fs.writeFileSync(hostRuntimePath, content);
+  console.log('  Fixed HOST_RUNTIME with Node.js implementation');
+}
+
+/**
  * Post-processes all files in the target directory, applying generic
  * transformations: stubbing top-level awaits and DOM API functions.
  */
@@ -855,6 +880,8 @@ function postProcessLibFiles(): void {
       totalDomStubbed += domCount;
     }
   }
+
+  fixHostRuntime();
 
   console.log(`Stubbed ${totalAwaitStubbed} top-level awaits total`);
   console.log(`Stubbed ${totalDomStubbed} DOM API functions total`);
