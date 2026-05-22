@@ -8,8 +8,9 @@ function makeFrame(
 	url: string,
 	lineNumber: number,
 	columnNumber: number,
+	scriptId = '' as Protocol.Runtime.ScriptId,
 ): Protocol.Runtime.CallFrame {
-	return { functionName, url, lineNumber, columnNumber, scriptId: '' as Protocol.Runtime.ScriptId };
+	return { functionName, url, lineNumber, columnNumber, scriptId };
 }
 
 describe('formatStackTrace', () => {
@@ -134,6 +135,26 @@ describe('formatStackTrace', () => {
 		assert.equal(
 			formatStackTrace(stack, { maxFrames: 1, syncOnly: true }),
 			'    at a (a.js:1:1)\n    ... 2 more frames',
+		);
+	});
+
+	it('uses <anonymous> for frames with no URL by default', () => {
+		const stack: Protocol.Runtime.StackTrace = {
+			callFrames: [makeFrame('eval', '', 11, 46, '42' as Protocol.Runtime.ScriptId)],
+		};
+		assert.equal(
+			formatStackTrace(stack),
+			'    at eval (<anonymous>:12:47)',
+		);
+	});
+
+	it('uses VM{scriptId} for frames with no URL when locationFallback is vm', () => {
+		const stack: Protocol.Runtime.StackTrace = {
+			callFrames: [makeFrame('eval', '', 11, 46, '42' as Protocol.Runtime.ScriptId)],
+		};
+		assert.equal(
+			formatStackTrace(stack, { locationFallback: 'vm' }),
+			'    at eval (VM42:12:47)',
 		);
 	});
 });
