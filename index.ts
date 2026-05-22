@@ -5,6 +5,8 @@ export type { EventCategorizeFunction } from './src/timeline.js';
 export { generateInvalidationsList } from './src/invalidations.js';
 export { createSourceMapResolver, symbolicateTrace } from './src/sourcemap.js';
 export type { SymbolicateOptions, SymbolicateResult } from './src/sourcemap.js';
+export { formatStackTrace } from './src/stacktrace.js';
+export type { FormatStackTraceOptions } from './src/stacktrace.js';
 import * as Trace from './lib/front_end/models/trace/trace.js';
 import * as SDK from './lib/front_end/core/sdk/sdk.js';
 import type * as Protocol from './lib/front_end/generated/protocol.js';
