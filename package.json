@@ -1,6 +1,6 @@
 {
   "name": "devtools-tracing",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Utilities for working with trace files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
