@@ -1,4 +1,4 @@
-import { loadHeapSnapshotFile } from '../src/heap.js';
+import { loadHeapSnapshotFile } from '../';
 
 /**
  * Loads and parses a `.heapsnapshot` file, then prints a summary of its size
