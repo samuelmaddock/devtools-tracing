@@ -2,12 +2,14 @@ import { run as cssSelectors } from './commands/selector-stats.js';
 import { run as inp } from './commands/inp.js';
 import { run as sourcemap, type SourcemapOptions } from './commands/sourcemap.js';
 import { run as stats } from './commands/stats.js';
+import { run as heapSnapshot } from './commands/heap-snapshot.js';
 
 const commands: Record<string, (tracePath: string, ...args: any[]) => Promise<void>> = {
   'selector-stats': cssSelectors,
   inp,
   sourcemap,
   stats,
+  'heap-snapshot': heapSnapshot,
 };
 
 function printUsage() {
@@ -17,6 +19,7 @@ function printUsage() {
   console.log('  inp            Extract INP (Interaction to Next Paint) breakdown');
   console.log('  sourcemap      Symbolicate a trace using source maps [-H "Header: value"]');
   console.log('  stats          Generate timeline category statistics');
+  console.log('  heap-snapshot  Load a .heapsnapshot file and print size stats');
 }
 
 function parseHeaders(args: string[]): Record<string, string> {

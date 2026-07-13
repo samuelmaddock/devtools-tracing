@@ -54,6 +54,11 @@ const COPY_LIST: CopyItem[] = [
     source: 'front_end/models/trace/trace.ts',
     resolveDependencies: true,
     excludeCategories: COMMON_EXCLUSION_CATEGORIES,
+  },
+  {
+    source: 'front_end/entrypoints/heap_snapshot_worker/heap_snapshot_worker.ts',
+    resolveDependencies: true,
+    excludeCategories: COMMON_EXCLUSION_CATEGORIES,
   }
 ];
 
